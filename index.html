@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Station Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo"><i class="fa-solid fa-palette"></i> Color Station</div>
+        <div class="tabs">
+            <button class="tab-btn active" data-target="#picker-tab">Renk Seçici</button>
+            <button class="tab-btn" data-target="#palette-tab">Palet</button>
+            <button class="tab-btn" data-target="#image-tab">Resim</button>
+            <button class="tab-btn" data-target="#gradient-tab">Gradient</button>
+            <button class="tab-btn" data-target="#contrast-tab">Kontrast</button>
+        </div>
+    </nav>
+
+    <div id="picker-tab" class="content active">
+        <div class="picker-container">
+            <div class="wheel-area">
+                <h3>Renk Seç</h3>
+                <div id="color-picker-wheel"></div>
+                <h2 id="selected-hex">#FFFFFF</h2>
+                <div class="wheel-buttons">
+                    <button id="eye-dropper-btn" class="dropper-btn"><i class="fa-solid fa-eye-dropper"></i> Ekrandan Seç</button>
+                    <button id="save-color-btn" class="save-btn"><i class="fa-solid fa-plus"></i> Listeye Ekle</button>
+                </div>
+            </div>
+            <div class="saved-area">
+                <div class="saved-header">
+                    <h3>Kaydedilenler</h3>
+                    <button onclick="clearAllColors()" class="clear-btn"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+                <div id="saved-list" class="saved-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="palette-tab" class="content">
+        <div class="palette-controls">
+            <div class="control-group">
+                <label>Algoritma:</label>
+                <select id="algo-select">
+                    <option value="random">Rastgele</option>
+                    <option value="monochromatic">Monokromatik</option>
+                    <option value="analogous">Analog</option>
+                    <option value="complementary">Zıt</option>
+                </select>
+            </div>
+            <div class="control-actions">
+                <button class="generate-btn">Yenile (Space)</button>
+                <button class="export-btn" onclick="exportPalette()">CSS Al</button>
+            </div>
+        </div>
+        <div class="colors-grid">
+            <div class="color-col"><div class="overlay"><button class="lock-btn"><i class="fa-solid fa-lock-open"></i></button><h2 class="hex-text">#------</h2><button class="copy-btn"><i class="fa-regular fa-copy"></i></button></div></div>
+            <div class="color-col"><div class="overlay"><button class="lock-btn"><i class="fa-solid fa-lock-open"></i></button><h2 class="hex-text">#------</h2><button class="copy-btn"><i class="fa-regular fa-copy"></i></button></div></div>
+            <div class="color-col"><div class="overlay"><button class="lock-btn"><i class="fa-solid fa-lock-open"></i></button><h2 class="hex-text">#------</h2><button class="copy-btn"><i class="fa-regular fa-copy"></i></button></div></div>
+            <div class="color-col"><div class="overlay"><button class="lock-btn"><i class="fa-solid fa-lock-open"></i></button><h2 class="hex-text">#------</h2><button class="copy-btn"><i class="fa-regular fa-copy"></i></button></div></div>
+            <div class="color-col"><div class="overlay"><button class="lock-btn"><i class="fa-solid fa-lock-open"></i></button><h2 class="hex-text">#------</h2><button class="copy-btn"><i class="fa-regular fa-copy"></i></button></div></div>
+        </div>
+    </div>
+
+    <div id="image-tab" class="content">
+        <div class="image-container">
+            <div class="upload-area" id="upload-area">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <p>Resim Yükle</p>
+                <input type="file" id="image-input" accept="image/*" hidden>
+            </div>
+            <div id="result-area" class="result-area" style="display: none;">
+                <img id="preview-img" src="" alt="Önizleme">
+                <div class="extracted-colors" id="extracted-colors"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="gradient-tab" class="content">
+        <div class="gradient-container">
+            <div id="gradient-preview" class="gradient-preview"></div>
+            <div class="gradient-controls">
+                <div class="color-inputs">
+                    <input type="color" id="grad-c1" value="#4facfe">
+                    <input type="color" id="grad-c2" value="#00f2fe">
+                </div>
+                <div class="slider-group">
+                    <label>Açı: <span id="angle-val">90</span>°</label>
+                    <input type="range" id="grad-angle" min="0" max="360" value="90">
+                </div>
+                <div class="code-box">
+                    <code id="css-code"></code>
+                    <button class="copy-css-btn" onclick="copyGradient()">Kopyala</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="contrast-tab" class="content">
+        <div class="contrast-container">
+            <div class="contrast-top">
+                <div class="contrast-inputs-area">
+                    <div class="contrast-input-group">
+                        <label>Arka Plan</label>
+                        <div class="c-input-wrapper"><input type="color" id="cont-bg" value="#ffffff"><span id="cont-bg-hex">#FFFFFF</span></div>
+                    </div>
+                    <button id="swap-colors-btn" class="swap-btn"><i class="fa-solid fa-arrow-right-arrow-left"></i></button>
+                    <div class="contrast-input-group">
+                        <label>Yazı Rengi</label>
+                        <div class="c-input-wrapper"><input type="color" id="cont-text" value="#000000"><span id="cont-text-hex">#000000</span></div>
+                    </div>
+                </div>
+                <div class="contrast-preview-box" id="contrast-preview-box">
+                    <div class="preview-content">
+                        <h1>Başlık Örneği</h1>
+                        <p class="bold-text">Kalın yazı tipi ile vurgu.</p>
+                        <p class="normal-text">Normal metin örneği. Bu alan web sitelerindeki paragrafların okunabilirliğini temsil eder.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contrast-results">
+                <div class="score-meter-container">
+                    <div class="score-header">
+                        <span class="ratio-title">Kontrast Oranı</span>
+                        <span class="ratio-value" id="contrast-ratio">21.00</span>
+                    </div>
+                    <div class="meter-bg">
+                        <div class="meter-fill" id="contrast-meter-fill"></div>
+                    </div>
+                    <div class="meter-labels">
+                        <span>Kötü (0)</span><span>İyi (4.5)</span><span>Mükemmel (21)</span>
+                    </div>
+                </div>
+                <div class="score-cards">
+                    <div class="score-card"><span class="score-label">Normal (AA)</span><span class="score-badge" id="score-aa-normal">GEÇTİ</span></div>
+                    <div class="score-card"><span class="score-label">Normal (AAA)</span><span class="score-badge" id="score-aaa-normal">GEÇTİ</span></div>
+                    <div class="score-card"><span class="score-label">Büyük (AA)</span><span class="score-badge" id="score-aa-large">GEÇTİ</span></div>
+                    <div class="score-card"><span class="score-label">Büyük (AAA)</span><span class="score-badge" id="score-aaa-large">GEÇTİ</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">Bildirim</div>
+    <script src="script.js"></script>
+</body>
+</html>

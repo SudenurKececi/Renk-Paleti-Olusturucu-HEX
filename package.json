@@ -1,0 +1,29 @@
+{
+  "name": "renk-istasyonu-pro",
+  "version": "1.0.0",
+  "description": "Profesyonel Renk Yonetim Araci",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "author": "Sudenur Kececi",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.sudenur.renkistasyonu",
+    "productName": "Renk Istasyonu",
+    "win": {
+      "target": "nsis",
+      "icon": "icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
